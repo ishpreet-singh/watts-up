@@ -17,7 +17,7 @@
             "user_04": "true"
         },
         "msg_id_003": {
-            "msg": "Billa Paaji Changeee, Raati Sutte ????",
+            "msg": "Billa",
             "sender": "user_03",
             "user_01": "true",
             "user_02": "true",
@@ -29,7 +29,7 @@
                 "name": "User 1"
             },
             "user_id_002": {
-                "name": "User 1"
+                "name": "User 2"
             },
             "user_id_003": {
                 "name": "User 3"
