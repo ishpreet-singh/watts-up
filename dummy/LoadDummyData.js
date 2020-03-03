@@ -23,6 +23,7 @@ function writeDataToNode(path, data) {
     nodePath = firebase.database().ref(path);
     if (nodePath) {
         nodePath.set(data);
+        console.log("Data written to Path successfully!");
     } else {
         console.log("Path Doen't Exist !!");
     }
@@ -53,17 +54,30 @@ function writeDummyData() {
     });
 }
 
+//Function to update value of a particular key
+function updateDataAtKey(path, value){
+
+  var updates = {};
+  updates[path] = value;
+  firebase.database().ref().update(updates);
+
+}
+
 function main() {
-    
+
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
 
 
     let rootNode = "/";
-    deleteDataFromNode(rootNode);
-    writeDummyData();
+    //deleteDataFromNode(rootNode);
+    //writeDummyData();
     // readData();
+
+    let path  = '/group_chat/msg_id_001/msg';
+    let value = 'Hey Ishpreet, Watts up?'
+    updateDataAtKey(path,value);
 }
 
 main();
