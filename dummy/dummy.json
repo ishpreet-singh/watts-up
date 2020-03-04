@@ -26,16 +26,16 @@
         },
         "users": {
             "user_id_001": {
-                "name": "User 1"
+                "name": "user_01"
             },
             "user_id_002": {
-                "name": "User 2"
+                "name": "user_02"
             },
             "user_id_003": {
-                "name": "User 3"
+                "name": "user_03"
             },
             "user_id_004": {
-                "name": "User 4"
+                "name": "user_04"
             }
         }
     }
