@@ -166,7 +166,6 @@ function deleteMessageForAllUsers(msgId, sender) {
 
     const callback = data => {
 
-        debugger;
         let userData = data.val()
         let users = getAllUsers(userData);
         let msgDetails = JSON.parse(JSON.stringify(userData))
