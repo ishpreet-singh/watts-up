@@ -12,7 +12,9 @@ function loadData() {
     });
 
     $.getJSON(path, function (data) {
-        readUserMsgs(user);
+        addNewMsg("Hello", "Shikari")
+        deleteMessageForSingleUser("msg_id_003", "user_03")
+        deleteMessageForAllUsers("msg_id_003", "user_03")
     });
     
     
