@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const firebase = require('firebase');
-let dummyJSON = fs.readFileSync('./dummy/dummy.json')
+let dataJSON = fs.readFileSync('./scripts/data.json')
 let firebaseConfig = fs.readFileSync('./scripts/config.json')
 const readline = require('readline')
 const rl = readline.createInterface({
@@ -211,7 +211,7 @@ function displayChatMenu() {
 function initialiseChatRoom() {
     initialise();
     deleteDataFromNode("/");
-    writeDataToNode("/", JSON.parse(dummyJSON));
+    writeDataToNode("/", JSON.parse(dataJSON));
     console.log("\n\n------------------- WATTS UP -------------------\n\n")
 }
 

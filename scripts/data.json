@@ -1,0 +1,42 @@
+{
+    "group_chat": {
+        "msg_id_001": {
+            "msg": "Hello!",
+            "sender": "user_02",
+            "user_01": "true",
+            "user_02": "true",
+            "user_03": "false",
+            "user_04": "true"
+        },
+        "msg_id_002": {
+            "msg": "Hi !",
+            "sender": "user_01",
+            "user_01": "true",
+            "user_02": "true",
+            "user_03": "true",
+            "user_04": "true"
+        },
+        "msg_id_003": {
+            "msg": "Billa",
+            "sender": "user_03",
+            "user_01": "true",
+            "user_02": "true",
+            "user_03": "true",
+            "user_04": "false"
+        },
+        "users": {
+            "user_id_001": {
+                "name": "user_01"
+            },
+            "user_id_002": {
+                "name": "user_02"
+            },
+            "user_id_003": {
+                "name": "user_03"
+            },
+            "user_id_004": {
+                "name": "user_04"
+            }
+        }
+    }
+}
