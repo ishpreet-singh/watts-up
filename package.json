@@ -1,0 +1,26 @@
+{
+  "name": "wattsup",
+  "version": "1.0.0",
+  "description": "Access Specific Chat App",
+  "main": "app.js",
+  "dependencies": {
+    "firebase": "^7.10.0",
+    "fs": "^0.0.1-security",
+    "require": "^2.4.20",
+    "requirejs": "^2.3.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ishpreet-singh/WattsUp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ishpreet-singh/WattsUp/issues"
+  },
+  "homepage": "https://github.com/ishpreet-singh/WattsUp#readme"
+}
