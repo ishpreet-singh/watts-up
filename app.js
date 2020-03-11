@@ -162,6 +162,7 @@ function deleteMessageForSingleUser(msgId, sender) {
         let msgDetails = JSON.parse(JSON.stringify(data))
         msgDetails[sender] = "false"
         updateDataToNode(path, msgDetails)
+        console.log("\nMessage deleted successful!")
 
     };
 
@@ -183,6 +184,9 @@ function deleteMessageForAllUsers(msgId, sender) {
                 let username = users[user]
                 msgDetails[msgId][username] = "false"
             }
+            console.log("\nMessage deleted successful!")
+        } else {
+            console.log("\nMessage deletion failed!")
         }
         updateDataToNode(path, msgDetails)
 
