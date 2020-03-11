@@ -9,7 +9,7 @@
             "user_04": "true"
         },
         "msg_id_002": {
-            "msg": "Hi !",
+            "msg": "Hi, How are you?",
             "sender": "user_01",
             "user_01": "true",
             "user_02": "true",
@@ -17,7 +17,7 @@
             "user_04": "true"
         },
         "msg_id_003": {
-            "msg": "Billa",
+            "msg": "Let's Hangout together.",
             "sender": "user_03",
             "user_01": "true",
             "user_02": "true",

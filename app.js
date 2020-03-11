@@ -22,7 +22,6 @@ function readDataFromNode(path, callback = () => { }, cbObj = {}) {
                 }
             }
             callback(snapshotObj);
-            // return snapshot.val();
         });
     } else {
         console.log("Path Doesn't Exist !!");
@@ -34,7 +33,6 @@ function writeDataToNode(path, data) {
     nodePath = firebase.database().ref(path);
     if (nodePath) {
         nodePath.set(data);
-        // console.log("Writing Data to Node Successful!");
     } else {
         console.log("Path Doen't Exist !!");
     }
@@ -55,7 +53,6 @@ function deleteDataFromNode(path) {
     nodePath = firebase.database().ref(path);
     if (nodePath) {
         nodePath.remove();
-        // console.log("Deleting Node Successful!");
     } else {
         console.log("Path Doen't Exist !!")
     }
@@ -153,7 +150,7 @@ function addNewMsg(msg, sender) {
 }
 
 
-function deleteMessageForSingleUser(msgId, sender) {
+function deleteMessageForSingleUser(msgId, sender, cb = () => {}) {
     path = "/group_chat/" + msgId + "/"
     nodePath = firebase.database().ref(path);
 
@@ -161,16 +158,16 @@ function deleteMessageForSingleUser(msgId, sender) {
 
         let msgDetails = JSON.parse(JSON.stringify(data))
         msgDetails[sender] = "false"
-        updateDataToNode(path, msgDetails)
         console.log("\nMessage deleted successful!")
-
+        updateDataToNode(path, msgDetails)
+        cb()
     };
 
     nodePath.once('value', callback)
 }
 
 
-function deleteMessageForAllUsers(msgId, sender) {
+function deleteMessageForAllUsers(msgId, sender, cb = () => {}) {
     path = "/group_chat/"
     nodePath = firebase.database().ref(path);
 
@@ -189,6 +186,7 @@ function deleteMessageForAllUsers(msgId, sender) {
             console.log("\nMessage deletion failed!")
         }
         updateDataToNode(path, msgDetails)
+        cb()
 
     };
 
@@ -196,9 +194,7 @@ function deleteMessageForAllUsers(msgId, sender) {
 }
 
 function initialise() {
-
     firebase.initializeApp(JSON.parse(firebaseConfig));
-    // console.log("Initializing Firebase App")
 }
 
 function displayChatMenu() {
@@ -216,7 +212,7 @@ function initialiseChatRoom() {
     initialise();
     deleteDataFromNode("/");
     writeDataToNode("/", JSON.parse(dataJSON));
-    console.log("\n\n------------------- WATTS UP -------------------\n\n")
+    console.log("\n------------------- WATTS UP -------------------\n")
 }
 
 function userMenu(user) {
@@ -251,17 +247,13 @@ function userMenu(user) {
         } else if (choice == 3) {
 
             rl.question("Enter message id to be deleted for " + user + " : ", (msgId) => {
-                deleteMessageForSingleUser(msgId, user);
-                console.log("\nMessage deleted successful!");
-                userMenu(user)
+                deleteMessageForSingleUser(msgId, user, () => userMenu(user));
             })
 
         } else if (choice == 4) {
 
             rl.question("Enter message id to be deleted for all users: ", (msgId) => {
-                deleteMessageForAllUsers(msgId, user)
-                console.log("\nMessage deleted successful!");
-                userMenu(user)
+                deleteMessageForAllUsers(msgId, user, () =>  userMenu(user))
             })
 
         } else if (choice == 5) {
@@ -277,9 +269,10 @@ function userMenu(user) {
 
 function login() {
 
-    nodePath.once("value", (snapshot) => {
+    let np = firebase.database().ref("/group_chat/");
+    np.once("value", (snapshot) => {
 
-        let users = getAllUsers(snapshot.val()["group_chat"])
+        let users = getAllUsers(snapshot.val())
 
         console.log("\nMembers in the chat:\n", users)
 
@@ -292,12 +285,8 @@ function login() {
 }
 
 function startChat() {
-
     initialiseChatRoom()
     login()
-
-    // getAllUsers();
 }
 
 startChat()
-
