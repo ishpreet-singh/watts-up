@@ -14,7 +14,7 @@ const rl = readline.createInterface({
 function readDataFromNode(path, callback = () => { }, cbObj = {}) {
     nodePath = firebase.database().ref(path);
     if (nodePath) {
-        nodePath.on("value", (snapshot) => {
+        nodePath.once("value", (snapshot) => {
             snapshotObj = JSON.parse(JSON.stringify(snapshot.val()))
             for (key in cbObj) {
                 if (cbObj[key]) {
@@ -34,7 +34,7 @@ function writeDataToNode(path, data) {
     nodePath = firebase.database().ref(path);
     if (nodePath) {
         nodePath.set(data);
-        console.log("Writing Data to Node Successful!");
+        // console.log("Writing Data to Node Successful!");
     } else {
         console.log("Path Doen't Exist !!");
     }
@@ -55,7 +55,7 @@ function deleteDataFromNode(path) {
     nodePath = firebase.database().ref(path);
     if (nodePath) {
         nodePath.remove();
-        console.log("Deleting Node Successful!");
+        // console.log("Deleting Node Successful!");
     } else {
         console.log("Path Doen't Exist !!")
     }
@@ -108,10 +108,10 @@ function getNewMessageId(data = {}) {
     }
     let msgId = maxId + 1
     let messageId = "msg_id_"
-    if (msgId < 100) {
-        messageId += "0"
-    } else if (msgId < 10) {
+    if (msgId < 10) {
         messageId += "00"
+    } else if (msgId < 100) {
+        messageId += "0"
     }
     messageId += String(msgId)
     return messageId
@@ -122,7 +122,6 @@ function readUserMsgs(sender) {
     callbackObj = {
         "senderName": sender
     }
-    console.log("Sender Name: ", sender)
     readDataFromNode(senderPath, readAllMsgsBySender, callbackObj)
 }
 
@@ -138,8 +137,6 @@ function addNewMsg(msg, sender) {
 
         msgDetails.msg = msg
         msgDetails.sender = sender
-
-        console.log("Users: ", users)
 
         for (let user in users) {
             msgDetails[users[user]] = "true"
@@ -181,8 +178,7 @@ function deleteMessageForAllUsers(msgId, sender) {
         let userData = data.val()
         let users = getAllUsers(userData);
         let msgDetails = JSON.parse(JSON.stringify(userData))
-        console.log("Users: ", users)
-        if(msgDetails[msgId].sender && sender == msgDetails[msgId].sender) {
+        if (msgDetails[msgId].sender && sender == msgDetails[msgId].sender) {
             for (let user in users) {
                 let username = users[user]
                 msgDetails[msgId][username] = "false"
@@ -195,56 +191,109 @@ function deleteMessageForAllUsers(msgId, sender) {
     nodePath.once('value', callback)
 }
 
-function getUserName() {
-    readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    }).question("Enter the name of user you want to extract chat:", (user) => {
-        console.log(user, " msgs are:\n")
-        readUserMsgs(user);
-    })
-}
-
-function addNewMsgForUser() {
-    // let userName = "";
-    // let msg = "";
-    rl.question("\nEnter username:", (username) => {
-        // userName = username;
-        rl.question("\nEnter msg:", (msg) => {
-            addNewMsg(msg, username)
-        })
-    })
-}
-
 function initialise() {
 
     firebase.initializeApp(JSON.parse(firebaseConfig));
-    console.log("Initializing Firebase App")
+    // console.log("Initializing Firebase App")
 }
 
+function displayChatMenu() {
+    console.log("\n---------------------------------------------")
+    console.log("\n1. View user messages")
+    console.log("\n2. Compose new message")
+    console.log("\n3. Delete message")
+    console.log("\n4. Delete message for all")
+    console.log("\n5. Login as another user")
+    console.log("\n0. Logout Chat Room")
+    console.log("\n---------------------------------------------\n")
+}
 
-function run() {
-    // console.log(`Hi ${name}!`)
-    console.log("firebaseConfig: ", JSON.parse(firebaseConfig))
-    
+function initialiseChatRoom() {
     initialise();
-    
     deleteDataFromNode("/");
-
     writeDataToNode("/", JSON.parse(dummyJSON));
-
-    let users = getAllUsers(JSON.parse(dummyJSON)["group_chat"])
-
-    console.log("Users in Chat Room\n", users)
-
-    // getUserName();
-
-    addNewMsgForUser();
-
-    // readUserMsgs("user_02");
-
-    // readline.close()
+    console.log("\n\n------------------- WATTS UP -------------------\n\n")
 }
 
-run()
+function userMenu(user) {
+    console.log("\n---------------------------------------------")
+    console.log("\nLogged in as: " + user)
+    displayChatMenu(user)
+
+    rl.question("\nEnter your choice: ", (choice) => {
+
+        choice = Number(choice)
+        console.log("\nLogged in as: ", user)
+
+        if (choice == 1) {
+
+            console.log("Chat logs for: ", user, "\n")
+            let nodePath = firebase.database().ref("/group_chat/");
+            nodePath.once("value", (snapshot) => {
+                snapshotObj = JSON.parse(JSON.stringify(snapshot.val()))
+                snapshotObj["senderName"] = user;
+                readAllMsgsBySender(snapshotObj);
+                userMenu(user);
+            });
+
+        } else if (choice == 2) {
+
+            rl.question("Enter your new message: ", (msg) => {
+                addNewMsg(msg, user);
+                console.log("\nMessage sent successful!")
+                userMenu(user)
+            })
+
+        } else if (choice == 3) {
+
+            rl.question("Enter message id to be deleted for " + user + " : ", (msgId) => {
+                deleteMessageForSingleUser(msgId, user);
+                console.log("\nMessage deleted successful!");
+                userMenu(user)
+            })
+
+        } else if (choice == 4) {
+
+            rl.question("Enter message id to be deleted for all users: ", (msgId) => {
+                deleteMessageForAllUsers(msgId, user)
+                console.log("\nMessage deleted successful!");
+                userMenu(user)
+            })
+
+        } else if (choice == 5) {
+            console.log("Bye " + user + "!")
+            login()
+        } else if (choice == 0) {
+            console.log(console.log("Bye " + user + "!"))
+            process.exit();
+        }
+
+    });
+}
+
+function login() {
+
+    nodePath.once("value", (snapshot) => {
+
+        let users = getAllUsers(snapshot.val()["group_chat"])
+
+        console.log("\nMembers in the chat:\n", users)
+
+        rl.question("\nEnter the name of user: ", (username) => {
+            userMenu(username)
+        })
+    });
+
+
+}
+
+function startChat() {
+
+    initialiseChatRoom()
+    login()
+
+    // getAllUsers();
+}
+
+startChat()
 
