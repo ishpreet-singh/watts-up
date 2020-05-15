@@ -11,26 +11,25 @@ const rl = readline.createInterface({
 });
 
 
-function readDataFromNode(path, callback = () => { }, cbObj = {}) {
-    nodePath = firebase.database().ref(path);
-    if (nodePath) {
-        nodePath.once("value", (snapshot) => {
-            snapshotObj = JSON.parse(JSON.stringify(snapshot.val()))
-            for (key in cbObj) {
-                if (cbObj[key]) {
-                    snapshotObj[key] = cbObj[key]
-                }
-            }
-            callback(snapshotObj);
-        });
-    } else {
-        console.log("Path Doesn't Exist !!");
-    }
+//------------------------ FIREBASE METHODS ------------------------
+
+/**
+ * @function initialise - Function to initialise a firebase app
+ */
+function initialise() {
+    firebase.initializeApp(JSON.parse(firebaseConfig));
 }
 
 
+//---------------------- NODE SPECIFIC METHODS ----------------------
+
+/**
+ * @function writeDataToNode  Function to write data to node
+ * @param path - path of node
+ * @param data - data to be added to node 
+ */
 function writeDataToNode(path, data) {
-    nodePath = firebase.database().ref(path);
+    let nodePath = firebase.database().ref(path);
     if (nodePath) {
         nodePath.set(data);
     } else {
@@ -38,8 +37,14 @@ function writeDataToNode(path, data) {
     }
 }
 
+
+/**
+ * @function updateDataToNode - Function to update data of node
+ * @param path - path of node
+ * @param data - data to be added to node 
+ */
 function updateDataToNode(path, data) {
-    nodePath = firebase.database().ref(path);
+    let nodePath = firebase.database().ref(path);
     if (nodePath) {
         nodePath.update(data);
     } else {
@@ -48,9 +53,12 @@ function updateDataToNode(path, data) {
 }
 
 
-
+/**
+ * @function deleteDataFromNode - Function to delete data from node
+ * @param path - path of node
+ */
 function deleteDataFromNode(path) {
-    nodePath = firebase.database().ref(path);
+    let nodePath = firebase.database().ref(path);
     if (nodePath) {
         nodePath.remove();
     } else {
@@ -58,6 +66,13 @@ function deleteDataFromNode(path) {
     }
 }
 
+
+//------------------------- USER METHODS -------------------------
+
+/**
+ * @function readAllMsgsBySender - Function to read all meseages by sender
+ * @param msgObj - the message object which contains sender's name
+ */
 function readAllMsgsBySender(msgObj) {
     sender = msgObj["senderName"]
     for (key in msgObj) {
@@ -69,12 +84,16 @@ function readAllMsgsBySender(msgObj) {
                 console.log(msgId, ":", msgSender, ":", message.msg)
             } else {
                 console.log(msgId, ":", msgSender, ":", "Message Deleted")
-                // console.log("Msg Deleted")
             }
         }
     }
 }
 
+
+/**
+ * @function getAllUsers Function to read all messages by sender
+ * @param msgObj - the message object which contains sender's name
+ */
 function getAllUsers(data = {}) {
     let users = []
     if (data["users"]) {
@@ -91,6 +110,11 @@ function getAllUsers(data = {}) {
 
 }
 
+
+/**
+ * @function getNewMessageId - Function to retrive new message Id
+ * @param data - data object
+ */
 function getNewMessageId(data = {}) {
     let msgIds = [];
     let maxId = 0
@@ -114,17 +138,15 @@ function getNewMessageId(data = {}) {
     return messageId
 }
 
-function readUserMsgs(sender) {
-    senderPath = "/group_chat/"
-    callbackObj = {
-        "senderName": sender
-    }
-    readDataFromNode(senderPath, readAllMsgsBySender, callbackObj)
-}
 
+/**
+ * @function addNewMsg - Function to add a new message
+ * @param msg - The message to be added
+ * @param sender - sender's name
+ */
 function addNewMsg(msg, sender) {
-    path = "/group_chat/"
-    nodePath = firebase.database().ref(path);
+    let path = "/group_chat/"
+    let nodePath = firebase.database().ref(path);
 
     const callback = data => {
         let userData = data.val()
@@ -150,9 +172,15 @@ function addNewMsg(msg, sender) {
 }
 
 
+/**
+ * @function deleteMessageForSingleUser - Function to delete message for a single user
+ * @param msgId - The message to be added
+ * @param sender - sender's name
+ * @param cb - callback function
+ */
 function deleteMessageForSingleUser(msgId, sender, cb = () => {}) {
-    path = "/group_chat/" + msgId + "/"
-    nodePath = firebase.database().ref(path);
+    let path = "/group_chat/" + msgId + "/"
+    let nodePath = firebase.database().ref(path);
 
     const callback = data => {
 
@@ -167,9 +195,15 @@ function deleteMessageForSingleUser(msgId, sender, cb = () => {}) {
 }
 
 
+/**
+ * @function deleteMessageForAllUsers - Function to delete the message for all users in the chat group
+ * @param msgId - The message to be added
+ * @sender - sender's name
+ * @cb - callback function
+ */
 function deleteMessageForAllUsers(msgId, sender, cb = () => {}) {
-    path = "/group_chat/"
-    nodePath = firebase.database().ref(path);
+    let path = "/group_chat/"
+    let nodePath = firebase.database().ref(path);
 
     const callback = data => {
 
@@ -193,10 +227,12 @@ function deleteMessageForAllUsers(msgId, sender, cb = () => {}) {
     nodePath.once('value', callback)
 }
 
-function initialise() {
-    firebase.initializeApp(JSON.parse(firebaseConfig));
-}
 
+//-------------------------- MENU METHODS --------------------------
+
+/**
+ * @function displayChatMenu - Function to display menu 
+ */
 function displayChatMenu() {
     console.log("\n---------------------------------------------")
     console.log("\n1. View user messages")
@@ -208,13 +244,11 @@ function displayChatMenu() {
     console.log("\n---------------------------------------------\n")
 }
 
-function initialiseChatRoom() {
-    initialise();
-    deleteDataFromNode("/");
-    writeDataToNode("/", JSON.parse(dataJSON));
-    console.log("\n------------------- WATTS UP -------------------\n")
-}
 
+/**
+ * @function userMenu - Function to display all choices
+ * @param user 
+ */
 function userMenu(user) {
     console.log("\n---------------------------------------------")
     console.log("\nLogged in as: " + user)
@@ -267,6 +301,24 @@ function userMenu(user) {
     });
 }
 
+
+//-------------------------- CHAT SPECIFIC METHODS --------------------------
+
+
+/**
+ * @function initialiseChatRoom - Function to initialise a chat room
+ */
+function initialiseChatRoom() {
+    initialise();
+    deleteDataFromNode("/");
+    writeDataToNode("/", JSON.parse(dataJSON));
+    console.log("\n------------------- WATTS UP -------------------\n")
+}
+
+
+/**
+ * @function login - Function to login in a chat room
+ */
 function login() {
 
     let np = firebase.database().ref("/group_chat/");
@@ -284,9 +336,15 @@ function login() {
 
 }
 
+
+/**
+ * @function startChat - Function to start a chat in char room
+ */
 function startChat() {
     initialiseChatRoom()
     login()
 }
 
+
+// Starting chat room
 startChat()
